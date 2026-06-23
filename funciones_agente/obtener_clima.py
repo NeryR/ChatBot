@@ -1,6 +1,6 @@
 import requests
 
-def obtener_clima(user_input):
+def obtener_clima(driver, user_input):
 
     city = user_input.lower().replace("clima", "").replace("temperatura", "").replace("en", "").replace("de", "").strip
 

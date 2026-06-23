@@ -3,19 +3,24 @@ from utils.sanitizar import sanitizar
 
 # Diccionario con las empresasa y sus acciones
 COMPANY_TICKERS = {
-    "apple": "AAPL",
     "microsoft": "MSFT",
+    "apple": "AAPL",
     "google": "GOOGL",
+    "alphabet": "GOOGL",
     "amazon": "AMZN",
-    "tesla": "TSLA",
-    "nvidia": "NVDA",
     "meta": "META",
+    "facebook": "META",
+    "netflix": "NFLX",
+    "nvidia": "NVDA",
+    "apple inc": "AAPL",
+    "microsoft corp": "MSFT",
 }
 
-def obtener_precio_accion(user_input):
+def obtener_precio_accion(driver, user_input):
+    company_name = sanitizar(user_input)
+
     ticker = COMPANY_TICKERS.get(company_name)
 
-    company_name = sanitizar(user_input)
 
     # Buscar si el nombre que el usuario está buscando está en nuestro mapa o diccionario
 
