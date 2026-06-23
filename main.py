@@ -1,4 +1,6 @@
 import re
+from funciones_agente.obtener_precio_accion import obtener_precio_accion
+from funciones_agente.obtener_clima import obtener_clima
 
 def chatbot():
     print("*** ChatBot v1.0.0 Iniciando ***")
@@ -34,7 +36,7 @@ def chatbot():
 
             # Caso 2: El usuario pregunta por el clima
             if weather_match:
-                temp = obtener_temperatura(None, user_input)
+                temp = obtener_clima(None, user_input)
                 if temp:
                     print(f">> {temp}")
                 else:
@@ -47,3 +49,9 @@ def chatbot():
         except KeyboardInterrupt:
             # Comando de salida
             print("ChatBot: Hasta luego!!")
+            break
+        except Exception as e:
+            print(f"ChatBot: Ocurrió un error insesperado {e}")
+
+if __name__ == "__main__":
+    chatbot()
