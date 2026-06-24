@@ -1,8 +1,10 @@
 import os
+import re
+import subprocess
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.chrome import ChromeDriveManager
+from webdriver_manager.chrome import ChromeDriverManager, ChromeType
 
 from funciones_agente.obtener_clima import obtener_clima
 from funciones_agente.obtener_precio_accion import obtener_precio_accion
@@ -11,15 +13,40 @@ from utils.sanitizar import sanitizar
 # --- Configuración de Selenium ---
 # Se utilizan opciones para ejecutar el navegador de forma silenciosa (headless)
 options = Options()
-options.add_argument("--headless")
+options.add_argument("--headless=new")
 options.add_argument("--disable-gpu")
 options.add_argument("--no-sandbox")
 options.add_argument("--disable-dev-shm-usage")
-# Simulación de un User-Agent real para evitar bloqueos por parte de algunos sitios
-options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
-options.add_argument('--disable-blink-features=AutomationControlled')
+options.add_argument("--disable-blink-features=AutomationControlled")
+options.add_argument("--remote-debugging-port=9222")
+options.add_argument("--disable-extensions")
+options.add_argument("--disable-background-networking")
+options.add_argument("--disable-background-timer-throttling")
+options.add_argument("--disable-client-side-phishing-detection")
+options.add_argument("--disable-default-apps")
+options.add_argument("--disable-popup-blocking")
+options.add_argument("--disable-sync")
+options.add_argument("--metrics-recording-only")
+options.add_argument("--no-first-run")
+options.add_argument("--safebrowsing-disable-auto-update")
+options.binary_location = "/usr/bin/chromium-browser"
 
-driver_path = ChromeDriveManager().install()
+RE_CHROME_VERSION = re.compile(r"(\d+\.\d+\.\d+\.\d+)")
+
+def get_chromium_version(binary_path="/usr/bin/chromium-browser"):
+    try:
+        proc = subprocess.run([binary_path, "--version"], capture_output=True, text=True, timeout=10)
+        output = (proc.stdout or proc.stderr or "").strip()
+        match = RE_CHROME_VERSION.search(output)
+        return match.group(1) if match else None
+    except Exception:
+        return None
+
+chromium_version = get_chromium_version()
+if chromium_version:
+    driver_path = ChromeDriverManager(driver_version=chromium_version, chrome_type=ChromeType.CHROMIUM).install()
+else:
+    driver_path = ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install()
 
 if os.path.basename(driver_path) != "chromedriver":
     dir_path = os.path.dirname(driver_path)
@@ -29,7 +56,7 @@ if os.path.basename(driver_path) != "chromedriver":
 
 os.chmod(driver_path, 0o755)
 
-driver = webdriver.Chrome(service=Service(driver_path, options=options))
+driver = webdriver.Chrome(service=Service(driver_path), options=options)
 
 def procesar_input(user_input):
     user_input = user_input.lower()

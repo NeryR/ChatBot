@@ -1,3 +1,10 @@
+import os
+import sys
+
+ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
+if ROOT_DIR not in sys.path:
+    sys.path.insert(0, ROOT_DIR)
+
 import yfinance as yf
 from utils.sanitizar import sanitizar
 
@@ -21,8 +28,12 @@ def obtener_precio_accion(driver, user_input):
 
     ticker = COMPANY_TICKERS.get(company_name)
 
-
-    # Buscar si el nombre que el usuario está buscando está en nuestro mapa o diccionario
+    # Buscar coincidencias parciales en nuestro diccionario de empresas
+    if not ticker and company_name:
+        for key, value in COMPANY_TICKERS.items():
+            if key in company_name:
+                ticker = value
+                break
 
     if not ticker:
         ticker = company_name.upper()
@@ -32,7 +43,6 @@ def obtener_precio_accion(driver, user_input):
         stock = yf.Ticker(ticker)
 
         # Obtener la información actualizada de dicha acción
-
         data = stock.history(period="1d")
 
         if not data.empty:

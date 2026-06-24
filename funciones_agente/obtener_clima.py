@@ -2,7 +2,7 @@ import requests
 
 def obtener_clima(driver, user_input):
 
-    city = user_input.lower().replace("clima", "").replace("temperatura", "").replace("en", "").replace("de", "").strip
+    city = user_input.lower().replace("clima", "").replace("temperatura", "").replace("en", "").replace("de", "").strip()
 
     try:
         response = requests.get(f"https://wttr.in/{city}?format=%t", timeout=10)
